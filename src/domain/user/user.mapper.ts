@@ -1,4 +1,4 @@
-import { Password, UserRequest } from "./user.dto";
+import { Password, UserRequest, UserResponse } from "./user.dto";
 import userSchema from "./user.schema"
 
 export default class UserMapper {
@@ -12,5 +12,15 @@ export default class UserMapper {
             weight: record.weight
         });
         return userEntity as unknown as typeof userSchema;
+    }
+
+    public static toResponse(record: any): UserResponse {
+        const userResponse: UserResponse = {
+            id: record._id,
+            username: record.username,
+            email: record.email,
+            weight: record.weight
+        }
+        return userResponse;
     }
 }

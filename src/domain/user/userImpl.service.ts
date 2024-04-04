@@ -5,7 +5,7 @@ import UserMapper from "./user.mapper";
 import userRepository from "./user.schema";
 import { UserService } from "./user.service";
 
-export class UserServiceImpl implements UserService  {
+class UserServiceImpl implements UserService  {
 
     async verifyIfUserExists(email: string) {
         const user = await userRepository.findOne({ email: email });
@@ -34,12 +34,17 @@ export class UserServiceImpl implements UserService  {
         if (!user) {
             throw new BadRequestException("User not found.");
         }
-        return user as UserResponse;
+        const userResponse = UserMapper.toResponse(user);
+        return userResponse as UserResponse;
     }
 
-    getUsers(): Promise<UserResponse[]> {
-        const users = userRepository.find();
-        return users as unknown as Promise<UserResponse[]>;
+    async getUsers(): Promise<UserResponse[]> {
+        const users = await userRepository.find();
+        const allUsers : UserResponse[] = await Promise.all(users.map(async user => {
+            const userResponse = UserMapper.toResponse(user);
+            return userResponse;
+        }))
+        return allUsers as unknown as Promise<UserResponse[]>;
     }
     
     updateUser(id: string, user: UserRequest): Promise<UserResponse> {
@@ -62,3 +67,5 @@ export class UserServiceImpl implements UserService  {
     }
 
 }
+
+export default new UserServiceImpl()
