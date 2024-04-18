@@ -33,11 +33,16 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
             if (!userId) {
                 return res.status(403).send({ message: 'Invalid token' });
             }
-            const user = await userImplService.getUser(userId);
-            if (!user) {
+            
+            try {
+                const user = await userImplService.getUser(userId);
+                if (!user) {
+                    return res.status(403).send({ message: 'Invalid token' });
+                }
+                req.user = user; 
+            } catch (error) {
                 return res.status(403).send({ message: 'Invalid token' });
             }
-            req.user = user;
 
             next();
         }

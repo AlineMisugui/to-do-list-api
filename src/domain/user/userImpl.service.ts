@@ -1,3 +1,4 @@
+import { ConflictException } from "../../exceptions/conflictException";
 import Jwt from "../../auth/jwt";
 import AuthUtils from "../../auth/utils";
 import { BadRequestException } from "../../exceptions/badRequestException";
@@ -11,7 +12,7 @@ class UserServiceImpl implements UserService  {
     async verifyIfUserExists(email: string) {
         const user = await userRepository.findOne({ email: email })
         if (user) {
-            throw new BadRequestException("User already exists")
+            throw new ConflictException("User already exists")
         }
     }
 
@@ -45,7 +46,7 @@ class UserServiceImpl implements UserService  {
 
     async getUser(id: string): Promise<UserResponse> {
         const user = await userRepository.findById(id);
-        if (!user) {
+        if (user == null) {
             throw new BadRequestException("User not found.");
         }
         const userResponse = UserMapper.toResponse(user);
@@ -61,8 +62,12 @@ class UserServiceImpl implements UserService  {
         return allUsers as unknown as Promise<UserResponse[]>;
     }
     
-    updateUser(id: string, user: UserRequest): Promise<UserResponse> {
-        this.getUser(id)
+    async updateUser(id: string, user: UserRequest): Promise<void> {
+        const userFind = await this.getUser(id)
+        if (userFind.email !== user.email) {
+            await this.verifyIfUserExists(user.email)
+        }
+        
         const encryptedPassword = AuthUtils.encryptPassword(user.password)
         const isPasswordConfirmationValid = AuthUtils.verifyPassword(
             user.password_confirmation, 
@@ -71,8 +76,7 @@ class UserServiceImpl implements UserService  {
         if (!isPasswordConfirmationValid) {
             throw new BadRequestException("Password and password confirmation doesn't match")
         }
-        const updatedUser = UserMapper.toEntity(user, encryptedPassword);
-        return userRepository.findByIdAndUpdate(id, updatedUser) as unknown as Promise<UserResponse>;
+        userRepository.findByIdAndUpdate(id, user);
     }
 
     async deleteUser(id: string): Promise<void> {

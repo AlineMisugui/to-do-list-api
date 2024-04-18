@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import BaseController from "../../senior/BaseController";
+import { UserRequest } from "./user.dto";
 import UserServiceImpl from "./userImpl.service";
 
 class UserController extends BaseController {
@@ -9,13 +10,13 @@ class UserController extends BaseController {
     });
 
     createUser = this.executeAction(async (req: Request, res: Response) => {
-        await userService.createUser(req.body);
+        await userService.createUser(req.body as UserRequest);
         res.status(201).send({ message: 'User created successfully'});
     });
 
     getUser = this.executeAction(async (req: Request, res: Response) => {
         const user = await userService.getUser(req.user.id);
-        res.status(200).send(req.user)
+        res.status(200).send(user)
     });
 
     getUsers = this.executeAction(async (req: Request, res: Response) => {
@@ -24,12 +25,12 @@ class UserController extends BaseController {
     });
 
     updateUser = this.executeAction(async (req: Request, res: Response) => {
-        const user = await userService.updateUser(req.params.id, req.body);
-        res.status(200).send(user)
+        const user = await userService.updateUser(req.user.id, req.body);
+        res.status(200).send({ message: 'User updated successfully' })
     });
 
     deleteUser = this.executeAction(async (req: Request, res: Response) => {
-        await userService.deleteUser(req.params.id);
+        await userService.deleteUser(req.user.id);
         res.status(200).send({ message: 'User deleted successfully' });
     });
 }

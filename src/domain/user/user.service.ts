@@ -5,6 +5,6 @@ export interface UserService {
     createUser(user: any): Promise<void>;
     getUser(id: string): Promise<UserResponse>;
     getUsers(): Promise<UserResponse[]>;
-    updateUser(id: string, user: UserRequest): Promise<UserResponse>;
+    updateUser(id: string, user: UserRequest): Promise<void>;
     deleteUser(id: string): Promise<void>;
 }
