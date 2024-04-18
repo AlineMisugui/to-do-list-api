@@ -1,6 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose';
 import { routes } from './routes';
+import Jwt from './src/auth/jwt';
 
 class App {
     express : express.Application
@@ -14,6 +15,23 @@ class App {
 
     private middleware(): void {
         this.express.use(express.json())
+        // this.express.use((req, res, next) => {
+        //     if (req.path === "/login" || req.path === "/register") {
+        //         next()
+        //     } else {
+        //         const token = req.headers.authorization
+        //         if (!token) {
+        //             res.status(401).send({ message: "Token not provided" })
+        //         } else {
+        //             const isTokenValid = Jwt.verifyToken(token || "")
+        //             if (!isTokenValid) {
+        //                 res.status(401).send({ message: "Invalid token" })
+        //             } else {
+        //                 next()
+        //             }
+        //         }
+        //     }
+        // })
     }
 
     private async database() {

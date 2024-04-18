@@ -2,15 +2,16 @@ import { Router } from 'express';
 import userController from './src/domain/user/user.controller';
 import categoryController from './src/domain/category/category.controller';
 import taskController from './src/domain/task/task.controller';
+import {authenticate} from './src/auth/authentication.middleware';
 
 const routes = Router();
-routes.post('/user', userController.createUser)
-routes.get('/user', userController.getUsers)
-routes.get('/user/:id', userController.getUser)
+
+routes.post('/login', userController.login)
+routes.post('/register', userController.createUser)
+routes.get('/user/all', authenticate, userController.getUsers)
+routes.get('/user', authenticate, userController.getUser)
 routes.put('/user/:id', userController.updateUser)
 routes.delete('/user/:id', userController.deleteUser)
-// routes.get('/teste', userController.teste);
-// routes.get('/teste', (req, res) => userController.teste(req, res));
 
 routes.get('/category', categoryController.getCategories)
 routes.get('/category/:id', categoryController.getCategory.bind(categoryController))

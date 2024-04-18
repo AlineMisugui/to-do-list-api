@@ -1,6 +1,7 @@
+import Jwt from "../../auth/jwt";
 import AuthUtils from "../../auth/utils";
 import { BadRequestException } from "../../exceptions/badRequestException";
-import { UserRequest, UserResponse } from "./user.dto";
+import { UserDTO, UserRequest, UserResponse } from "./user.dto";
 import UserMapper from "./user.mapper";
 import userRepository from "./user.schema";
 import { UserService } from "./user.service";
@@ -8,15 +9,15 @@ import { UserService } from "./user.service";
 class UserServiceImpl implements UserService  {
 
     async verifyIfUserExists(email: string) {
-        const user = await userRepository.findOne({ email: email });
+        const user = await userRepository.findOne({ email: email })
         if (user) {
-            throw new BadRequestException("User already exists.");
+            throw new BadRequestException("User already exists")
         }
     }
 
     async createUser(user: UserRequest): Promise<void> {
         if (!user) {
-            throw new BadRequestException("User is required.")
+            throw new BadRequestException("User is required")
         }
         const encryptedPassword = AuthUtils.encryptPassword(user.password)
         const isPasswordConfirmationValid = AuthUtils.verifyPassword(user.password_confirmation, encryptedPassword.salt, encryptedPassword.hash) 
@@ -25,8 +26,21 @@ class UserServiceImpl implements UserService  {
         }
         await this.verifyIfUserExists(user.email);
 
-        const newUser = UserMapper.toEntity(user, encryptedPassword);
-        await userRepository.create(newUser);
+        const newUser = UserMapper.toEntity(user, encryptedPassword)
+        await userRepository.create(newUser)
+    }
+
+    async login(email: string, password: string): Promise<string> {
+        const user: UserDTO | null = await userRepository.findOne({ email });
+        if (!user) {
+            throw new BadRequestException("User not found.");
+        }
+        const isPasswordValid = AuthUtils.verifyPassword(password, user.password_salt || "", user.password || "");
+        if (!isPasswordValid) {
+            throw new BadRequestException("Invalid password.");
+        }
+        const token = Jwt.generateToken({ email: user.email || "", username: user.username || "", _id: user._id || "" });
+        return token;
     }
 
     async getUser(id: string): Promise<UserResponse> {

@@ -6,7 +6,7 @@ class BaseController {
             try {
                 await action(req, res);
             } catch (error: any) {
-                res.status(400).send({ name: error.name, message: error.message });
+                return res.status(error.statusCode ? error.statusCode : 500).send({ message: error.message ? error.message : "Internal server error" });
             }
         }
     }

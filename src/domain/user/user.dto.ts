@@ -6,6 +6,16 @@ export interface UserRequest {
     weight: number
 }
 
+export interface UserDTO {
+    _id: string,
+    username: string,
+    email: string,
+    password: string,
+    password_confirmation: string,
+    password_salt: string,
+    weight: number
+}
+
 export interface UserResponse {
     id: string,
     username: string,
