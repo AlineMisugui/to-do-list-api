@@ -5,7 +5,7 @@ export default class CategoryMapper {
 
     public static toEntity(category: CategoryRequest): typeof categorySchema {
         const categoryEntity = new categorySchema({
-            user: category.userId,
+            userId: category.userId,
             name: category.name,
             color: category.color
         });

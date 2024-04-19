@@ -26,7 +26,7 @@ class UserController extends BaseController {
 
     updateUser = this.executeAction(async (req: Request, res: Response) => {
         const user = await userService.updateUser(req.user.id, req.body);
-        res.status(200).send({ message: 'User updated successfully' })
+        res.status(202).send({ message: 'User updated successfully' })
     });
 
     deleteUser = this.executeAction(async (req: Request, res: Response) => {

@@ -4,6 +4,8 @@ import categoryController from './src/domain/category/category.controller';
 import taskController from './src/domain/task/task.controller';
 import {authenticate} from './src/auth/authentication.middleware';
 import { validateUserRequest } from './src/middlewares/userInputsMiddleware';
+import { validateTaskRequest } from './src/middlewares/taskInputsMiddleware';
+import { validateCategoryRequest } from './src/middlewares/categoryInputsMiddleware';
 
 const routes = Router();
 
@@ -14,17 +16,19 @@ routes.get('/user', authenticate, userController.getUser)
 routes.put('/user', authenticate, validateUserRequest, userController.updateUser)
 routes.delete('/user', authenticate, userController.deleteUser)
 
-routes.get('/category', categoryController.getCategories)
-routes.get('/category/:id', categoryController.getCategory.bind(categoryController))
-routes.post('/category', categoryController.createCategory)
-routes.put('/category/:id', categoryController.updateCategory.bind(categoryController))
-routes.delete('/category/:id', categoryController.deleteCategory)
+routes.get('/category/all', authenticate, categoryController.getCategories)
+routes.get('/category/by-user', authenticate, categoryController.getCategoriesByUser)
+routes.get('/category/:id', authenticate, categoryController.getCategory)
+routes.post('/category', authenticate, validateCategoryRequest, categoryController.createCategory)
+routes.put('/category/:id', authenticate, validateCategoryRequest, categoryController.updateCategory)
+routes.delete('/category/:id', authenticate, categoryController.deleteCategory)
 
-routes.get('/task/by-user', authenticate, taskController.getTasks)
-routes.get('/task/:id', taskController.getTask.bind(taskController))
-routes.post('/task', taskController.createTask)
-routes.put('/task/:id', taskController.updateTask.bind(taskController))
-routes.delete('/task/:id', taskController.deleteTask)
+routes.get('/task/all', authenticate, taskController.getTasks)
+routes.get('/task/by-user', authenticate, taskController.getTasksByUser)
+routes.get('/task/:id', authenticate, taskController.getTask.bind(taskController))
+routes.post('/task', authenticate, validateTaskRequest, taskController.createTask)
+routes.put('/task/:id', authenticate, validateTaskRequest, taskController.updateTask.bind(taskController))
+routes.delete('/task/:id', authenticate, taskController.deleteTask)
 
 export {
     routes

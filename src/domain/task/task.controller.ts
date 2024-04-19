@@ -12,12 +12,12 @@ class TaskController extends BaseController {
     }
 
     createTask = this.executeAction(async (req: Request, res: Response) => {
-        const task = await this.taskService.createTask(req.body);
+        await this.taskService.createTask(req.body, req.user.id);
         res.status(201).send({ message: 'Task created successfully' });
     });
 
     getTask = this.executeAction(async (req: Request, res: Response) => {
-        const task = await this.taskService.getTask(req.params.id);
+        const task = await this.taskService.getTask(req.params.id, req.user.id);
         res.status(200).send(task)
     });
 
@@ -26,13 +26,18 @@ class TaskController extends BaseController {
         res.status(200).send(tasks)
     });
 
+    getTasksByUser = this.executeAction(async (req: Request, res: Response) => {
+        const tasks = await this.taskService.getTasksByUser(req.user.id);
+        res.status(200).send(tasks)
+    });
+
     updateTask = this.executeAction(async (req: Request, res: Response) => {
-        const task = await this.taskService.updateTask(req.params.id, req.body);
-        res.status(200).send(task)
+        const task = await this.taskService.updateTask(req.params.id, req.body, req.user.id);
+        res.status(202).send(task)
     });
 
     deleteTask = this.executeAction(async (req: Request, res: Response) => {
-        await this.taskService.deleteTask(req.params.id);
+        await this.taskService.deleteTask(req.params.id, req.user.id);
         res.status(200).send({ message: 'Task deleted successfully' });
     });
 }

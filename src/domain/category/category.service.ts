@@ -1,9 +1,10 @@
 import { CategoryRequest, CategoryResponse } from "./category.dto";
 
 export interface CategoryService {
-    createCategory(category: any): Promise<void>;
-    getCategory(id: string): Promise<CategoryResponse>;
+    createCategory(category: any, userId: string): Promise<void>;
+    getCategory(id: string, userId: string|null): Promise<CategoryResponse>;
     getCategories(): Promise<CategoryResponse[]>;
-    updateCategory(id: string, category: CategoryRequest): Promise<CategoryResponse>;
-    deleteCategory(id: string): Promise<void>;
+    getCategoriesByUser(userId: string): Promise<CategoryResponse[]>;
+    updateCategory(id: string, category: CategoryRequest, userId: string): Promise<CategoryResponse>;
+    deleteCategory(id: string, userId: string): Promise<void>;
 }

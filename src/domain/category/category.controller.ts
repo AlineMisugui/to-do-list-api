@@ -12,12 +12,12 @@ class CategoryController extends BaseController {
     }
 
     createCategory = this.executeAction(async (req: Request, res: Response) => {
-        const category = await this.categoryService.createCategory(req.body);
+        const category = await this.categoryService.createCategory(req.body, req.user.id);
         res.status(201).send({ message: 'Category created successfully' });
     });
 
     getCategory = this.executeAction(async (req: Request, res: Response) => {
-        const category = await this.categoryService.getCategory(req.params.id);
+        const category = await this.categoryService.getCategory(req.params.id, req.user.id);
         res.status(200).send(category)
     });
 
@@ -26,13 +26,18 @@ class CategoryController extends BaseController {
         res.status(200).send(categories)
     });
 
+    getCategoriesByUser = this.executeAction(async (req: Request, res: Response) => {
+        const categories = await this.categoryService.getCategoriesByUser(req.user.id);
+        res.status(200).send(categories)
+    });
+
     updateCategory = this.executeAction(async (req: Request, res: Response) => {
-        const category = await this.categoryService.updateCategory(req.params.id, req.body);
-        res.status(200).send(category)
+        const category = await this.categoryService.updateCategory(req.params.id, req.body, req.user.id);
+        res.status(202).send(category)
     });
 
     deleteCategory = this.executeAction(async (req: Request, res: Response) => {
-        await this.categoryService.deleteCategory(req.params.id);
+        await this.categoryService.deleteCategory(req.params.id, req.user.id);
         res.status(200).send({ message: 'Category deleted successfully' });
     });
 }
