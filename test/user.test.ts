@@ -1,9 +1,22 @@
-import app from "../app"
-import { describe, it, expect } from "@jest/globals"
-import userSchema from "../src/domain/user/user.schema"
-import * as request from "supertest"
+import { describe, expect, it } from "@jest/globals";
+import * as request from "supertest";
+import app from "../app";
 
-describe("Testando endpoints de users", () => {
+let server: any;
+
+beforeAll(async () => {
+    server = app.listen(3001, () => {
+        console.log("Server running on port 3001")
+    })
+})
+
+afterAll((done) => {
+    server.close(() => {
+        done();
+    });
+});
+
+describe("Testing user endpoints", () => {
     const userMock = {
         username: "User Test",
         password: "senha123",
@@ -11,42 +24,62 @@ describe("Testando endpoints de users", () => {
         email: `email${Math.random()}@email.com`,
         weight: 40.0
     }
-    var userTestId: string = "";
+    var token: string = "";
 
     it("Must insert an user in the database", async () => {
-        const response = await request.default(app).post("/user").send(userMock)
-        const findUser = await userSchema.findById(response.body._id)
+        const response = await request.default(app).post("/register").send(userMock)
 
         expect(response.status).toEqual(201)
-        expect(response.body._id).toBeDefined()
-        expect(userMock.email).toBe(findUser?.email)
+        expect(response.body).toHaveProperty("message")
+        expect(response.body.message).toEqual("User created successfully")
+    })
+
+    it("Must login an user in the database", async () => {
+        const response = await request.default(app).post("/login").send({
+            email: userMock.email,
+            password: userMock.password
+        })
+
+        expect(response.status).toEqual(200)
+        expect(response.body).toHaveProperty("token")
+        token = response.body.token
     })
 
     it("Must update an user in the database", async () => {
         userMock.username = "User Test Updated"
-        const response = await request.default(app).put(`/user/${userTestId}`).send(userMock)
+        const response = await request.default(app)
+            .put(`/user`)
+            .set('Authorization', `Bearer ${token}`)
+            .send(userMock)
 
+        const userUpdated = await request.default(app).get(`/user`).set('Authorization', `Bearer ${token}`)
+    
         expect(response.status).toEqual(202)
+        expect(userUpdated.body.username).toEqual("User Test Updated")
     })
 
     it("Must return all users from the database", async () => {
-        const response = await request.default(app).get("/user")
+        const response = await request.default(app).get("/user/all").set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toEqual(200)
         expect(response.body).toBeInstanceOf(Array)
-        userTestId = response.body[0]._id;
     })
 
-    it("Must return an user from the database by id", async () => {
-        const response = await request.default(app).get(`/user/${userTestId}`)
+    it("Must return the logged user from the database", async () => {
+        const response = await request.default(app).get(`/user`).set('Authorization', `Bearer ${token}`)
 
         expect(response.status).toEqual(200)
+        expect(response.body).toHaveProperty("username")
+        expect(response.body).toHaveProperty("email")
+        expect(response.body).toHaveProperty("weight")
     })
 
     it("Must delete an user from the database", async () => {
-        const responseDelete = await request.default(app).delete(`/user/${userTestId}`)
+        const responseDelete = await request.default(app).delete(`/user`).set('Authorization', `Bearer ${token}`)
+        const searchDeletedUser = await request.default(app).get(`/user`).set('Authorization', `Bearer ${token}`)
 
         expect(responseDelete.status).toEqual(200)
+        expect(searchDeletedUser.status).toEqual(403)
     })
 
 })

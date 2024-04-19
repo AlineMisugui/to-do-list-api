@@ -76,7 +76,7 @@ class UserServiceImpl implements UserService  {
         if (!isPasswordConfirmationValid) {
             throw new BadRequestException("Password and password confirmation doesn't match")
         }
-        userRepository.findByIdAndUpdate(id, user);
+        await userRepository.findByIdAndUpdate(id, user);
     }
 
     async deleteUser(id: string): Promise<void> {
