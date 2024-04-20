@@ -4,11 +4,11 @@ import { UserResponse } from "../user/user.dto"
 export interface TaskRequest {
     title: string, 
     description: string, 
-    conclusion: Date | null,
+    conclusion?: Date | null,
     type: string,
     categoryId: string,
-    status: ["PENDING", "IN_COURSE", "FINALIZED"],
-    userId: string
+    status: string,
+    userId?: string
 }
 
 export interface TaskResponse {

@@ -2,30 +2,16 @@ import { describe, expect, it } from "@jest/globals";
 import * as request from "supertest";
 import app from "../app";
 
-let server: any;
-
-beforeAll(async () => {
-    server = app.listen(3001, () => {
-        console.log("Server running on port 3001")
-    })
-})
-
-afterAll((done) => {
-    server.close(() => {
-        done();
-    });
-});
+const userMock = {
+    username: "User Test",
+    password: "senha123",
+    password_confirmation: "senha123",
+    email: `email${Math.random()}@email.com`,
+    weight: 40.0
+}
+var token: string = "";
 
 describe("Testing user endpoints", () => {
-    const userMock = {
-        username: "User Test",
-        password: "senha123",
-        password_confirmation: "senha123",
-        email: `email${Math.random()}@email.com`,
-        weight: 40.0
-    }
-    var token: string = "";
-
     it("Must insert an user in the database", async () => {
         const response = await request.default(app).post("/register").send(userMock)
 

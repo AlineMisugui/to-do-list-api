@@ -32,8 +32,8 @@ class TaskController extends BaseController {
     });
 
     updateTask = this.executeAction(async (req: Request, res: Response) => {
-        const task = await this.taskService.updateTask(req.params.id, req.body, req.user.id);
-        res.status(202).send(task)
+        await this.taskService.updateTask(req.params.id, req.body, req.user.id);
+        res.status(202).send({ message: 'Task updated successfully' })
     });
 
     deleteTask = this.executeAction(async (req: Request, res: Response) => {

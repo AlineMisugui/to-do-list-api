@@ -8,15 +8,13 @@ import userImplService from "../user/userImpl.service";
 import CategoryMapper from "../category/category.mapper";
 import UserMapper from "../user/user.mapper";
 import { ForbiddenException } from "../../exceptions/forbiddenException";
+import { NotFoundException } from "../../exceptions/notFoundException";
 
 class TaskServiceImpl implements TaskService {
     async verifyCategory(categoryId: string, userId: string): Promise<void> {
         const category = await categoryImplService.getCategory(categoryId, userId);
         if (!category) {
             throw new BadRequestException("Category not found.");
-        }
-        if (category.user.id !== userId) {
-            throw new ForbiddenException("User not allowed to create task in this category.");
         }
     }
 
@@ -30,9 +28,9 @@ class TaskServiceImpl implements TaskService {
     async getTask(id: string, userId: string): Promise<TaskResponse> {
         const task = await taskRepository.findById(id);
         if (!task) {
-            throw new BadRequestException("Task not found.");
+            throw new NotFoundException("Task not found.");
         }
-        if (userId !== task.userId) {
+        if (userId.toString() !== task.userId?.toString()) {
             throw new ForbiddenException("User not allowed to access this task.");
         }
         const category = await categoryService.getCategory(task.categoryId ?? '', userId);
@@ -92,13 +90,12 @@ class TaskServiceImpl implements TaskService {
 
     async updateTask(id: string, task: TaskRequest, userId: string): Promise<void> {
         await this.verifyCategory(task.categoryId, userId);
-        this.getTask(id, userId);
-        const updatedTask = TaskMapper.toEntity(task);
-        await taskRepository.findByIdAndUpdate(id, updatedTask);
+        await this.getTask(id, userId);
+        await taskRepository.findByIdAndUpdate(id, task);
     }
 
     async deleteTask(id: string, userId: string): Promise<void> {
-        this.getTask(id, userId);
+        await this.getTask(id, userId);
         await taskRepository.findByIdAndDelete(id);
     }
 }

@@ -60,7 +60,6 @@ class CategoryServiceImpl implements CategoryService {
 
     async getCategoriesByUser(userId: string): Promise<CategoryResponse[]> {
         const categories = await categoryRepository.find({ userId: userId });
-        console.log(categories);
 
         var allCategories: CategoryResponse[] = await Promise.all(categories.map(async category => {
             const user = await this.userService.getUser(category.userId ?? "")
