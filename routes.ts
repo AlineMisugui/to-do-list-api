@@ -2,7 +2,7 @@ import { Router } from 'express';
 import userController from './src/domain/user/user.controller';
 import categoryController from './src/domain/category/category.controller';
 import taskController from './src/domain/task/task.controller';
-import {authenticate} from './src/auth/authentication.middleware';
+import { authenticate } from './src/auth/authentication.middleware';
 import { validateUserRequest } from './src/middlewares/userInputsMiddleware';
 import { validateTaskRequest } from './src/middlewares/taskInputsMiddleware';
 import { validateCategoryRequest } from './src/middlewares/categoryInputsMiddleware';

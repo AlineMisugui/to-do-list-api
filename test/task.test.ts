@@ -1,8 +1,7 @@
-import { it, expect, describe } from "@jest/globals";
+import { describe, expect, it } from "@jest/globals";
+import { TaskRequest } from "src/domain/task/task.dto";
 import * as request from "supertest";
 import app from "../app";
-import { CategoryRequest } from "src/domain/category/category.dto";
-import { TaskRequest } from "src/domain/task/task.dto";
 
 const taskMock: TaskRequest = {
     title: "Teste",
