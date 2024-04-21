@@ -14,7 +14,7 @@ export default class CategoryMapper {
 
     public static toResponse(record: any): CategoryResponse {
         const categoryResponse: CategoryResponse = {
-            id: record._id,
+            id: record.id,
             user: record.user,
             name: record.name,
             color: record.color

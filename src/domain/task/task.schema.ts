@@ -6,8 +6,8 @@ const taskSchema = new Schema({
     conclusion: Date,
     type: String,
     categoryId: String,
-    status: ["PENDING", "IN_COURSE", "FINALIZED"],
-    userId: String
+    status: String,
+    userId: String,
 }, {
     timestamps: true
 })

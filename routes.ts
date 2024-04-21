@@ -23,6 +23,16 @@ routes.post('/category', authenticate, validateCategoryRequest, categoryControll
 routes.put('/category/:id', authenticate, validateCategoryRequest, categoryController.updateCategory)
 routes.delete('/category/:id', authenticate, categoryController.deleteCategory)
 
+routes.get('/task/longer-description', authenticate, taskController.getTaskWithLongerDescription)
+routes.get('/task/grouped-by-category', authenticate, taskController.getTasksGroupedByCategory)
+routes.get('/task/concluded', authenticate, taskController.getConcludedTasks)
+routes.get('/task/pending', authenticate, taskController.getPendingTasks)
+routes.get('/task/count', authenticate, taskController.countTasks)
+routes.get('/task/average', authenticate, taskController.getAverageTaskConcluded)
+routes.get('/task/newer', authenticate, taskController.getNewerTask)
+routes.get('/task/older', authenticate, taskController.getOlderTask)
+routes.get('/task/by-category/:categoryId', authenticate, taskController.getTasksByCategory)
+
 routes.get('/task/all', authenticate, taskController.getTasks)
 routes.get('/task/by-user', authenticate, taskController.getTasksByUser)
 routes.get('/task/:id', authenticate, taskController.getTask.bind(taskController))

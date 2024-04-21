@@ -18,6 +18,6 @@ export interface TaskResponse {
     conclusion: Date,
     type: string,
     category: CategoryResponse,
-    status: ["PENDING", "IN_COURSE", "FINALIZED"],
+    status: string,
     user: UserResponse
 }
