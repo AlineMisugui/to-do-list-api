@@ -42,7 +42,12 @@ class TaskServiceImpl implements TaskService {
 
     async getConcludedTasks(userId: string): Promise<TaskResponse[]> {
         const tasks = await taskRepository.find({ userId: userId, status: "FINALIZED" });
-        const allTasks: TaskResponse[] = await Promise.all(tasks.map(async task => {
+        const allTasks: TaskResponse[] = await this.mapTasksToResponses(tasks, userId);
+        return allTasks as unknown as TaskResponse[];
+    }
+
+    async mapTasksToResponses(tasks: any, userId: string): Promise<TaskResponse[]> {
+        const allTasks: TaskResponse[] = await Promise.all(tasks.map(async (task: any) => {
             const category = await categoryService.getCategory(task.categoryId ?? '', userId);
             const user = await userService.getUser(task.userId ?? '');
             const taskResponse: TaskResponse = {
@@ -57,7 +62,8 @@ class TaskServiceImpl implements TaskService {
             };
             return taskResponse;
         }));
-        return allTasks as unknown as TaskResponse[];
+    
+        return allTasks;
     }
 
     async getPendingTasks(userId: string): Promise<TaskResponse[]> {
@@ -86,41 +92,13 @@ class TaskServiceImpl implements TaskService {
 
     async getOlderTask(userId: string): Promise<TaskResponse[]> {
         const tasks = await taskRepository.find({ userId: userId }).sort({ createdAt: 1 }).limit(1);
-        const allTasks: TaskResponse[] = await Promise.all(tasks.map(async task => {
-            const category = await categoryService.getCategory(task.categoryId ?? '', userId);
-            const user = await userService.getUser(task.userId ?? '');
-            const taskResponse: TaskResponse = {
-                id: task.id,
-                category: CategoryMapper.toResponse(category),
-                title: task.title ?? '',
-                description: task.description ?? '',
-                conclusion: task.conclusion ? new Date(task.conclusion) : '' as any,
-                type: task.type ?? '',
-                status: task.status ?? '',
-                user: UserMapper.toResponse(user)
-            };
-            return taskResponse;
-        }));
+        const allTasks: TaskResponse[] = await this.mapTasksToResponses(tasks, userId);
         return allTasks as unknown as TaskResponse[];
     }
 
     async getNewerTask(userId: string): Promise<TaskResponse[]> {
         const tasks = await taskRepository.find({ userId: userId }).sort({ createdAt: -1 }).limit(1);
-        const allTasks: TaskResponse[] = await Promise.all(tasks.map(async task => {
-            const category = await categoryService.getCategory(task.categoryId ?? '', userId);
-            const user = await userService.getUser(task.userId ?? '');
-            const taskResponse: TaskResponse = {
-                id: task.id,
-                category: CategoryMapper.toResponse(category),
-                title: task.title ?? '',
-                description: task.description ?? '',
-                conclusion: task.conclusion ? new Date(task.conclusion) : '' as any,
-                type: task.type ?? '',
-                status: task.status ?? '',
-                user: UserMapper.toResponse(user)
-            };
-            return taskResponse;
-        }));
+        const allTasks: TaskResponse[] = await this.mapTasksToResponses(tasks, userId);
         return allTasks as unknown as TaskResponse[];
     }
 
@@ -155,21 +133,7 @@ class TaskServiceImpl implements TaskService {
 
     async getTasksGroupedByCategory(userId: string): Promise<any> {
         const tasks = await taskRepository.find({ userId: userId });
-        const allTasks: TaskResponse[] = await Promise.all(tasks.map(async task => {
-            const category = await categoryService.getCategory(task.categoryId ?? '', userId);
-            const user = await userService.getUser(task.userId ?? '');
-            const taskResponse: TaskResponse = {
-                id: task.id,
-                category: CategoryMapper.toResponse(category),
-                title: task.title ?? '',
-                description: task.description ?? '',
-                conclusion: task.conclusion ? new Date(task.conclusion) : '' as any,
-                type: task.type ?? '',
-                status: task.status ?? '',
-                user: UserMapper.toResponse(user)
-            };
-            return taskResponse;
-        }));
+        const allTasks: TaskResponse[] = await this.mapTasksToResponses(tasks, userId);
         const tasksGrouped = allTasks.reduce((acc: any, task: TaskResponse) => {
             const categoryTasks: CategoryTasksResponse = {
                 id: task.category.id,
@@ -223,41 +187,13 @@ class TaskServiceImpl implements TaskService {
 
     async getTasks(): Promise<TaskResponse[]> {
         const tasks = await taskRepository.find();
-        const allTasks: TaskResponse[] = await Promise.all(tasks.map(async task => {
-            const category = await categoryService.getCategory(task.categoryId??"", null);
-            const user = await userService.getUser(task.userId ?? '');
-            const taskResponse : TaskResponse = {
-                id: task.id,
-                category: CategoryMapper.toResponse(category),
-                title: task.title ?? '',
-                description: task.description ?? '',
-                conclusion: task.conclusion ? new Date(task.conclusion) : '' as any,
-                type: task.type ?? '',
-                status: task.status ?? '',
-                user: UserMapper.toResponse(user)
-            }
-            return taskResponse;
-        }));
+        const allTasks: TaskResponse[] = await this.mapTasksToResponses(tasks, '');
         return allTasks as unknown as TaskResponse[];
     }
 
     async getTasksByUser(id: string): Promise<TaskResponse[]> {
         const tasks = await taskRepository.find({ userId : id });
-        const allTasks: TaskResponse[] = await Promise.all(tasks.map(async task => {
-            const category = await categoryService.getCategory(task.categoryId ?? '', id);
-            const user = await userService.getUser(task.userId ?? '');
-            const taskResponse : TaskResponse = {
-                id: task.id,
-                category: CategoryMapper.toResponse(category),
-                title: task.title ?? '',
-                description: task.description ?? '',
-                conclusion: task.conclusion ? new Date(task.conclusion) : '' as any,
-                type: task.type ?? '',
-                status: task.status ?? '',
-                user: UserMapper.toResponse(user)
-            }
-            return taskResponse;
-        }));
+        const allTasks: TaskResponse[] = await this.mapTasksToResponses(tasks, id);
         return allTasks as unknown as TaskResponse[];
     }
 
